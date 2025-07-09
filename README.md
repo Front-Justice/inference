@@ -121,7 +121,7 @@ Ces fichiers serviront à l’analyse NER.
 Appliquer le modèle LLM Phi-4 pour corriger automatiquement les transcriptions HTR, y compris les toponymes :
 
 ```bash
-python3 ollama.py
+python3 post-oll.py
 ```
 
 ---
