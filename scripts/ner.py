@@ -63,8 +63,55 @@ Dans la section "CEJOURD" à "A l'effet de juger", trouve ces informations :
 
 Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
 """,
+    "A l'effet de juger": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "A l'effet de juger" à "La séance ayant été ouverte", trouve ces informations :
+- nom de l'accusé
+- prénoms de l'accusé
+- parents de l'accusé
+    - prénoms du père de l'accusé
+    - nom et prénoms de la mère de l'accusé
+- date de naissance de l'accusé
+- lieu de naissance de l'accusé
+- département de naissance l'accusé
+- profession de l'accusé
+- lieu de résidence de l'accusé avant son entrée au service
+- caractérstique physique de l'accusé
+    - taille de l'accusé
+    - couleur des cheveux de l'accusé
+    - caractéristique du front de l'accusé
+    - couleur des yeux de l'accusé
+    - caractéristique du nez de l'accusé
+    - caratéristique du visage de l'accusé
+    - renseignements physionomiques complémentaires de l'accusé
+    - marque particulière de l'accusé
+- raison de son inculpation
+- ses condamnations antérieures (s'il y en a sous forme de liste)
 
-    # Tu peux en ajouter d'autres ici pour les autres sections
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "La séance ayant été ouverte": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "La séance ayant été ouverte" à "Interrogé de", trouve ces informations :
+- défenseur
+    - nom du défenseur
+    - grade du défenseur
+    - s'il est d'office ou désigné par l'accusé
+    
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "Interrogé de": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Tu as déjà extrait les informations suivantes sur l’accusé à partir de la section "A l'effet de juger" :
+
+[JSON_ACCUSÉ]
+
+Lis maintenant la section "Interrogé de" à "Le Président, après avoir fait lire". Utilise-la pour :
+- confirmer ou corriger les informations déjà extraites
+- ajouter des informations manquantes si elles sont présentes
+
+Retourne uniquement un JSON **corrigé ou enrichi**, avec les mêmes champs. Ne retourne rien d’autre que ce JSON final.
+"""
 }
 
 # === Fonctions ===
@@ -136,7 +183,17 @@ resultat_json = {}
 
 for nom_section, contenu in sections:
     print(f"📚 Traitement de la section : {nom_section}")
+
     prompt = PROMPTS_SECTIONS.get(nom_section)
+
+    # Cas spécial pour "Interrogé de"
+    if nom_section == "Interrogé de":
+        donnees_existantes = resultat_json.get("A l'effet de juger", {})
+        if not donnees_existantes:
+            print("⚠️ Aucune donnée à enrichir pour 'Interrogé de', section ignorée.")
+            continue
+        donnees_json_str = json.dumps(donnees_existantes, ensure_ascii=False, indent=2)
+        prompt = PROMPTS_SECTIONS["Interrogé de"].replace("[JSON_ACCUSÉ]", donnees_json_str)
 
     if prompt:
         reponse_brute = envoyer_prompt_sur_bloc(prompt, contenu)
@@ -147,8 +204,13 @@ for nom_section, contenu in sections:
                 json_str = "\n".join(json_str.splitlines()[1:-1])
             try:
                 resultat = json.loads(json_str)
-                resultat_json[nom_section] = resultat
-                print(f"✅ Section {nom_section} traitée avec succès.")
+                # Cas spécial : on remplace les données de "A l'effet de juger"
+                if nom_section == "Interrogé de":
+                    resultat_json["A l'effet de juger"] = resultat
+                    print("✅ Données de l'accusé enrichies via 'Interrogé de'")
+                else:
+                    resultat_json[nom_section] = resultat
+                    print(f"✅ Section {nom_section} traitée avec succès.")
             except json.JSONDecodeError as e:
                 print(f"⚠️ JSON invalide pour la section {nom_section} :", e)
                 resultat_json[nom_section] = {"_raw_response": json_str}

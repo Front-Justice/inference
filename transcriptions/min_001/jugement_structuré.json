@@ -1,24 +1,81 @@
 {
     "RÉPUBLIQUE FRANÇAISE": {
-        "numero_armee": "2",
-        "numero_jugement": "83",
+        "numero_armee": 2,
+        "numero_jugement": 83,
         "date_du_crime_ou_du_delit": "16 Janvier 1917",
-        "lieu_seant": null
+        "seant_a": null
     },
     "CEJOURD": {
-        "president_du_jugement": "Audié",
-        "grade_du_president": "Colonel de Gendarmerie Prévôt de l'Armée",
+        "président_du_jugement": "Audié",
+        "grade_du_président": "Colonel de Gendarmerie Prévôt de l'Armée",
         "juge_1_du_jugement": "Décot",
         "grade_du_juge_1": "Chef d'Escadron de Gendarmerie Prévôt d'Etappe",
         "juge_2_du_jugement": "Stoecklin",
-        "grade_du_juge_2": "Capitaine au 138e Rég^t de T. d'Infanterie",
+        "grade_du_juge_2": "Capitaine au 138^e Rég^t de T. d'Infanterie",
         "juge_3_du_jugement": "Febvret",
-        "grade_du_juge_3": "Lieutenant au 61e Rég^t de T. d'Infanterie",
+        "grade_du_juge_3": "Lieutenant au 61^e Rég^t de T. d'Infanterie",
         "juge_4_du_jugement": "Lapierre",
-        "grade_du_juge_4": "Adjudant au 138e Rég^t de T. d'Infanterie",
+        "grade_du_juge_4": "Adjudant au 138^e Rég^t de T. d'Infanterie",
         "commissaire_du_gouvernement": "Cuaz",
         "grade_du_commissaire_du_gouvernement": "Capitaine Commissaire du Gouvernement",
-        "greffier_pres_ledit_conseil": "Depigny",
+        "greffier_près_ledit_conseil": "Depigny",
         "grade_du_greffier": "sergent Commis"
+    },
+    "A l'effet de juger": {
+        "nom_de_l_accuse": "Blanchard",
+        "prenoms_de_l_accuse": "André Georges",
+        "parents_de_l_accuse": {
+            "prenom_du_pere_de_l_accuse": "Pierre Georges",
+            "nom_et_prenoms_de_la_mere_de_l_accuse": "Barbouteau Germaine, Marie"
+        },
+        "date_de_naissance_de_l_accuse": "5 Décembre 1896",
+        "lieu_de_naissance_de_l_accuse": "La Celle Sur Morin",
+        "departement_de_naissance_de_l_accuse": "Seine et Marne",
+        "profession_de_l_accuse": "garçon de café",
+        "lieu_de_residence_de_l_accuse_avant_son_entree_au_service": "Paris 18^e arrondissement",
+        "caracteristique_physique_de_l_accuse": {
+            "taille_de_l_accuse": "un mètre 61 centimètres",
+            "couleur_des_cheveux_de_l_accuse": "châtains",
+            "caracteristique_du_front_de_l_accuse": "front moyen",
+            "couleur_des_yeux_de_l_accuse": "rous-châtains",
+            "caracteristique_du_nez_de_l_accuse": "des cape",
+            "caracteristique_du_visage_de_l_accuse": "visage ovale",
+            "renseignements_physionomiques_complementaires_de_l_accuse": null,
+            "marque_particuliere_de_l_accuse": null
+        },
+        "raison_de_son_inculpation": "Désertion à l'Intérieur en temps de guerre",
+        "condamnations_anterieures": [
+            {
+                "date": "13 Octobre 1913",
+                "lieu": "Seine, 8^e A^b",
+                "infraction": "Escroquerie",
+                "verdict": "acquitté et remis à ses parents"
+            },
+            {
+                "date": "23 février 1916",
+                "lieu": "1^er Cours de g. Paris",
+                "infraction": "Complicité de vol par recel",
+                "peine": "3 mois"
+            },
+            {
+                "date": "17 Mai 1916",
+                "lieu": "Conseil de f^e Orléans",
+                "infraction": "Vol simple",
+                "peine": "2 mois"
+            },
+            {
+                "date": "24 octobre 1916",
+                "lieu": "Conseil de f^e 125^e R.I.",
+                "infraction": "Désertion à l'int en temps de guerre",
+                "peene": "2 ans travaux publics (peine suspendue)"
+            }
+        ]
+    },
+    "La séance ayant été ouverte": {
+        "defenseur": {
+            "nom_du_defenseur": "M. Laisne",
+            "grade_du_defenseur": "soldat notaire autorisé",
+            "statut": "d'office"
+        }
     }
 }
