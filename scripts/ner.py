@@ -39,10 +39,31 @@ Dans la section "RÉPUBLIQUE FRANÇAISE" à "CEJOURD", trouve ces informations :
 - numéro de l'armée
 - numéro du jugement
 - date du crime ou du délit
-- lieu où est séant le jugement
+- séant à
 
 Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
 """,
+    "CEJOURD": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "CEJOURD" à "A l'effet de juger", trouve ces informations :
+- président du jugement
+- grade du président
+- juge 1 du jugement
+- grade du juge 1
+- juge 2 du jugement
+- grade du juge 2
+- juge 3 du jugement
+- grade du juge 3
+- juge 4 du jugement
+- grade du juge 4
+- commissaire du gouvernement
+- grade du commissaire du gouvernement
+- greffier près ledit conseil 
+- grade du greffier
+
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+
     # Tu peux en ajouter d'autres ici pour les autres sections
 }
 

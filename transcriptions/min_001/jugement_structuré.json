@@ -1,8 +1,24 @@
 {
     "RÉPUBLIQUE FRANÇAISE": {
-        "numéro_de_l_armée": "2",
-        "numéro_du_jugement": "83",
-        "date_du_crime_ou_du_délit": "16 Janvier 1917",
-        "lieu_où_est_séant_le_jugement": "Armées secteur Postal 2H"
+        "numero_armee": "2",
+        "numero_jugement": "83",
+        "date_du_crime_ou_du_delit": "16 Janvier 1917",
+        "lieu_seant": null
+    },
+    "CEJOURD": {
+        "president_du_jugement": "Audié",
+        "grade_du_president": "Colonel de Gendarmerie Prévôt de l'Armée",
+        "juge_1_du_jugement": "Décot",
+        "grade_du_juge_1": "Chef d'Escadron de Gendarmerie Prévôt d'Etappe",
+        "juge_2_du_jugement": "Stoecklin",
+        "grade_du_juge_2": "Capitaine au 138e Rég^t de T. d'Infanterie",
+        "juge_3_du_jugement": "Febvret",
+        "grade_du_juge_3": "Lieutenant au 61e Rég^t de T. d'Infanterie",
+        "juge_4_du_jugement": "Lapierre",
+        "grade_du_juge_4": "Adjudant au 138e Rég^t de T. d'Infanterie",
+        "commissaire_du_gouvernement": "Cuaz",
+        "grade_du_commissaire_du_gouvernement": "Capitaine Commissaire du Gouvernement",
+        "greffier_pres_ledit_conseil": "Depigny",
+        "grade_du_greffier": "sergent Commis"
     }
 }
