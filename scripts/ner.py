@@ -4,6 +4,7 @@ import time
 import re
 import json
 import sys
+import glob
 
 OLLAMA_MODEL = "phi4"
 API_URL = "http://localhost:11434/api/chat"
@@ -28,8 +29,23 @@ SECTION_KEYWORDS = [
 ]
 
 # === Fichiers ===
-fichier_texte = "../transcriptions/min_001/min_001_corrige.txt"
-fichier_sortie = "../transcriptions/min_001/jugement_structuré.json"
+# Trouver tous les dossiers min_*
+dossiers_minutes = sorted(glob.glob("../transcriptions/min_*"))
+
+# Ne garder que ceux qui contiennent un fichier *_corrige.txt
+minutes_a_traiter = []
+for dossier in dossiers_minutes:
+    nom = os.path.basename(dossier)
+    nom_minute = nom  # ex: min_001
+    fichier_texte = os.path.join(dossier, f"{nom_minute}_corrige.txt")
+    if os.path.exists(fichier_texte):
+        fichier_sortie = os.path.join(dossier, f"{nom_minute}_ner.json")
+        minutes_a_traiter.append((fichier_texte, fichier_sortie))
+
+if not minutes_a_traiter:
+    print("Aucune minute trouvée à traiter.")
+    sys.exit(0)
+
 
 # === PROMPTS PAR SECTION ===
 PROMPTS_SECTIONS = {
@@ -56,6 +72,7 @@ Dans la section "CEJOURD" à "A l'effet de juger", trouve ces informations :
 - grade du juge 3
 - juge 4 du jugement
 - grade du juge 4
+(il y a toujours 4 juges, tu dois les trouver, ils sont entre le président et "tous nommés par le")
 - commissaire du gouvernement
 - grade du commissaire du gouvernement
 - greffier près ledit conseil 
@@ -76,6 +93,8 @@ Dans la section "A l'effet de juger" à "La séance ayant été ouverte", trouve
 - département de naissance l'accusé
 - profession de l'accusé
 - lieu de résidence de l'accusé avant son entrée au service
+- état civil de l'accusé
+- enfant naturel ou légitime de l'accusé
 - caractérstique physique de l'accusé
     - taille de l'accusé
     - couleur des cheveux de l'accusé
@@ -230,52 +249,53 @@ def envoyer_prompt_sur_bloc(prompt, bloc):
     return None
 
 # === Traitement principal ===
+for fichier_texte, fichier_sortie in minutes_a_traiter:
+    print(f"\n📂 Traitement de la minute : {fichier_texte}")
+    
+    with open(fichier_texte, "r", encoding="utf-8") as f:
+        texte_jugement = f.read()
 
-with open(fichier_texte, "r", encoding="utf-8") as f:
-    texte_jugement = f.read()
+    sections = decouper_en_sections(texte_jugement, SECTION_KEYWORDS)
 
-sections = decouper_en_sections(texte_jugement, SECTION_KEYWORDS)
+    resultat_json = {}
 
-resultat_json = {}
+    for nom_section, contenu in sections:
+        print(f"📚 Traitement de la section : {nom_section}")
 
-for nom_section, contenu in sections:
-    print(f"📚 Traitement de la section : {nom_section}")
+        prompt = PROMPTS_SECTIONS.get(nom_section)
 
-    prompt = PROMPTS_SECTIONS.get(nom_section)
+        # Cas spécial pour "Interrogé de"
+        if nom_section == "Interrogé de":
+            donnees_existantes = resultat_json.get("A l'effet de juger", {})
+            if not donnees_existantes:
+                print("⚠️ Aucune donnée à enrichir pour 'Interrogé de', section ignorée.")
+                continue
+            donnees_json_str = json.dumps(donnees_existantes, ensure_ascii=False, indent=2)
+            prompt = PROMPTS_SECTIONS["Interrogé de"].replace("[JSON_ACCUSÉ]", donnees_json_str)
 
-    # Cas spécial pour "Interrogé de"
-    if nom_section == "Interrogé de":
-        donnees_existantes = resultat_json.get("A l'effet de juger", {})
-        if not donnees_existantes:
-            print("⚠️ Aucune donnée à enrichir pour 'Interrogé de', section ignorée.")
-            continue
-        donnees_json_str = json.dumps(donnees_existantes, ensure_ascii=False, indent=2)
-        prompt = PROMPTS_SECTIONS["Interrogé de"].replace("[JSON_ACCUSÉ]", donnees_json_str)
+        if prompt:
+            reponse_brute = envoyer_prompt_sur_bloc(prompt, contenu)
+            if reponse_brute:
+                json_str = reponse_brute.strip()
+                if json_str.startswith("```"):
+                    json_str = "\n".join(json_str.splitlines()[1:-1])
+                try:
+                    resultat = json.loads(json_str)
+                    if nom_section == "Interrogé de":
+                        resultat_json["A l'effet de juger"] = resultat
+                        print("✅ Données de l'accusé enrichies via 'Interrogé de'")
+                    else:
+                        resultat_json[nom_section] = resultat
+                        print(f"✅ Section {nom_section} traitée avec succès.")
+                except json.JSONDecodeError as e:
+                    print(f"⚠️ JSON invalide pour la section {nom_section} :", e)
+                    resultat_json[nom_section] = {"_raw_response": json_str}
+        else:
+            print(f"⚠️ Pas de prompt défini pour la section : {nom_section}, elle est ignorée.")
 
-    if prompt:
-        reponse_brute = envoyer_prompt_sur_bloc(prompt, contenu)
+    # === Sauvegarde du JSON final ===
+    print(f"💾 Sauvegarde du JSON structuré dans {fichier_sortie}")
+    with open(fichier_sortie, "w", encoding="utf-8") as f:
+        json.dump(resultat_json, f, ensure_ascii=False, indent=4)
 
-        if reponse_brute:
-            json_str = reponse_brute.strip()
-            if json_str.startswith("```"):
-                json_str = "\n".join(json_str.splitlines()[1:-1])
-            try:
-                resultat = json.loads(json_str)
-                # Cas spécial : on remplace les données de "A l'effet de juger"
-                if nom_section == "Interrogé de":
-                    resultat_json["A l'effet de juger"] = resultat
-                    print("✅ Données de l'accusé enrichies via 'Interrogé de'")
-                else:
-                    resultat_json[nom_section] = resultat
-                    print(f"✅ Section {nom_section} traitée avec succès.")
-            except json.JSONDecodeError as e:
-                print(f"⚠️ JSON invalide pour la section {nom_section} :", e)
-                resultat_json[nom_section] = {"_raw_response": json_str}
-    else:
-        print(f"⚠️ Pas de prompt défini pour la section : {nom_section}, elle est ignorée.")
-
-# === Sauvegarde finale ===
-print(f"💾 Sauvegarde du JSON structuré dans {fichier_sortie}")
-with open(fichier_sortie, "w", encoding="utf-8") as f:
-    json.dump(resultat_json, f, ensure_ascii=False, indent=4)
-print("✅ Extraction terminée.")
+    print("✅ Traitement terminé pour cette minute.")
