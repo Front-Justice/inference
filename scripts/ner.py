@@ -111,7 +111,64 @@ Lis maintenant la section "Interrogé de" à "Le Président, après avoir fait l
 - ajouter des informations manquantes si elles sont présentes
 
 Retourne uniquement un JSON **corrigé ou enrichi**, avec les mêmes champs. Ne retourne rien d’autre que ce JSON final.
-"""
+""",
+    "Ouï M. le Commissaire": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918. 
+Dans la section "Ouï M. le Commissaire" à "L'accusé a été reconduit", trouve ces informations :
+- réquisitoire du commissaire du gouvernement
+    - déclaré coupable ou non coupable
+    - article du code militaire cité
+    
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "L'accusé a été reconduit": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "L'accusé a été reconduit" à "Les voix recueillies séparément", trouve ces informations :
+- inculpation
+    - faits reprochés à l'accusé
+    - date du crime ou du délit
+    - lieu du crime ou du délit
+    - compléments d'information sur le crime ou le délit
+    - complicité(s) éventuel(s)
+
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "Les voix recueillies séparément": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "Les voix recueillies séparément" à "Sur quoi, et attendu les conclusions", trouve ces informations :
+- décision du Conseil de guerre
+    - coupable ou non coupable
+    - unanimité ou majorité des voix
+    
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "Sur quoi, et attendu les conclusions": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "Sur quoi, et attendu les conclusions" à "Enjoint au Commissaire du Gouvernement", trouve ces informations :
+- peine prononcée
+    - nature de la peine (ex. : emprisonnement, amende, etc.)
+    - durée de la peine (si applicable)
+    - autres mesures (ex. : dégradation, confiscation, etc.)
+- article du code militaire appliqué
+
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "Enjoint au Commissaire du Gouvernement": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "Enjoint au Commissaire du Gouvernement" à "EXÉCUTOIRE", trouve ces informations :
+- exécution de la peine
+ - date de lecture présent jugement
+ - lieu de la séance publique 
+ 
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""",
+    "EXÉCUTOIRE": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "EXÉCUTOIRE", trouve ces informations :
+- somme à payer par l'accusé
+
+Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+""", 
 }
 
 # === Fonctions ===
