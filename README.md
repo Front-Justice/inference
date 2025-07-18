@@ -35,13 +35,19 @@ Le traitement suit une chaîne bien définie :
 
 1. Se placer dans `htr/dataset`
 2. Placer les numérisations dans le dossier `dataset`
-3. Lancer la détection des objets et des lignes :
+3. Convertir les images en `jpg`
 
 ```bash
-yaltai kraken --device cuda:0 -a -I "*.tif" --suffix ".xml" segment --yolo models/weights.pt -i models/250p-escript.mlmodel
+mogrify -format jpg *.tif
 ```
 
-📎 Résultat : fichiers ALTO `.xml` générés à partir des images `.tif`, avec support GPU.
+4. Lancer la détection des objets et des lignes :
+
+```bash
+yaltai kraken --device cuda:0 -a -I "*.jpg" --suffix ".xml" segment --yolo models/weights.pt -i models/250p-escript.mlmodel
+```
+
+📎 Résultat : fichiers ALTO `.xml` générés à partir des images `.jpg`, avec support GPU.
 
 ---
 
