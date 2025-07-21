@@ -44,7 +44,7 @@ mogrify -format jpg *.tif
 4. Lancer la détection des objets et des lignes :
 
 ```bash
-yaltai kraken --device cuda:0 -a -I "*.jpg" --suffix ".xml" segment --yolo models/weights.pt -i models/250p-escript.mlmodel
+yaltai kraken --device cuda:0 -a -I "*.jpg" --suffix ".xml" segment --yolo models/weights.pt -i models/lignes.mlmodel
 ```
 
 📎 Résultat : fichiers ALTO `.xml` générés à partir des images `.jpg`, avec support GPU.
