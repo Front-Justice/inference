@@ -113,6 +113,11 @@ for f in files:
         zone_type = region_map.get(tagref, "unknown")
 
         for line in block.findall("alto:TextLine", NS):
+            line_tagref = line.attrib.get("TAGREFS")
+            # ⚠️ Si la ligne est marquée comme "scratched", on l’ignore
+            if line_tagref and region_map.get(line_tagref) == "CustomLine:scratched":
+                continue  
+
             strings = line.findall("alto:String", NS)
             contents = [s.attrib.get("CONTENT", "") for s in strings]
             line_text = " ".join(contents).strip()
