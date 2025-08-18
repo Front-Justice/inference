@@ -5,6 +5,8 @@ import re
 import json
 import sys
 import glob
+import unicodedata
+
 
 OLLAMA_MODEL = "phi4"
 API_URL = "http://localhost:11434/api/chat"
@@ -53,9 +55,15 @@ PROMPTS_SECTIONS = {
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
 Dans la section "RÉPUBLIQUE FRANÇAISE" à "CEJOURD", trouve ces informations :
 - numéro de l'armée
-- numéro du jugement
-- date du crime ou du délit
+- numéro du jugement (parfois la ligne sous "Jugement")
+- date du crime ou du délit 
 - séant à
+
+Il y a parfois également des informations sur l'exécution de la peine (avant "Au nom du peuple français").
+Si c'est le cas, trouve :
+ - date d'exécution de la peine
+ - si la peine a été exécutée ou non
+ - etc.
 
 Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
 """,
@@ -192,21 +200,53 @@ Retourne un JSON avec ces champs. Si une information est absente, indique `null`
 
 # === Fonctions ===
 
+def normaliser(texte: str) -> str:
+    """Normalise le texte (NFC, supprime les doubles espaces, harmonise casse)."""
+    texte = unicodedata.normalize("NFC", texte)
+    return texte
+
 def decouper_en_sections(texte, keywords):
-    pattern = r"(?=(" + "|".join(re.escape(k) for k in keywords) + r"))"
+    """
+    Découpe le texte en sections selon les mots-clés.
+    Cas particulier : EXÉCUTOIRE s'arrête toujours avant '=== Notes en marge ==='.
+    """
+    texte = normaliser(texte)
+
+    # Création des indices pour tous les mots-clés
+    pattern = r"(?i)(?=(" + "|".join(re.escape(k) for k in keywords) + r"))"
     indices = [m.start() for m in re.finditer(pattern, texte)]
     if not indices:
         return [("Texte complet", texte)]
 
     sections = []
+    skip_until = -1  # pour ignorer doublons EXÉCUTOIRE
     for i, start in enumerate(indices):
-        end = indices[i + 1] if i + 1 < len(indices) else len(texte)
-        section = texte[start:end].strip()
+        if start < skip_until:
+            continue
+
+        # Identifier le mot-clé correspondant
+        titre_section = None
         for kw in keywords:
-            if section.startswith(kw):
-                sections.append((kw, section))
+            if texte[start:].upper().startswith(kw.upper()):
+                titre_section = kw
                 break
+        if not titre_section:
+            continue
+
+        # Cas spécial EXÉCUTOIRE
+        if titre_section.upper() == "EXÉCUTOIRE":
+            end = texte.find("=== Notes en marge ===", start)
+            if end == -1:
+                end = len(texte)
+            skip_until = end  # ignorer tous les EXÉCUTOIRE avant Notes en marge
+        else:
+            end = indices[i+1] if i+1 < len(indices) else len(texte)
+
+        section = texte[start:end].strip()
+        sections.append((titre_section, section))
+
     return sections
+
 
 def envoyer_prompt_sur_bloc(prompt, bloc):
     messages = [

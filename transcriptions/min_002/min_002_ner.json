@@ -1,0 +1,105 @@
+{
+    "RÉPUBLIQUE FRANÇAISE": {
+        "numéro_de_l_armée": "IV^e",
+        "numéro_du_jugement": 336,
+        "date_du_crime_ou_du_délit": "11 Décembre 1915",
+        "séant_à": "Châlons-sur-Marne",
+        "date_d'exécution_de_la_peine": null,
+        "peine_exécutée": "suspendue"
+    },
+    "A l'effet de juger": {
+        "nom_de_l_accuse": "Louvigny",
+        "prénoms_de_l_accuse": "Louis, Auguste",
+        "parents_de_l_accuse": {
+            "père": {
+                "prénoms_du_père": "Louis, Auguste"
+            },
+            "mère": {
+                "nom_et_prénoms_de_la_mère": "Lepape, Pauline, Marie"
+            }
+        },
+        "date_de_naissance_de_l_accuse": "19 Décembre 1895",
+        "lieu_de_naissance_de_l_accuse": "Paris, arrondissement du 8^e département de la Seine",
+        "département_de_naissance_l_accuse": "la Seine",
+        "profession_de_l_accuse": "cultivateur",
+        "lieu_de_résidence_avant_entree_au_service": "Gennevilliers, 34 Rue Royale Bergère, Arrondissement de Saint-Denis, département de la Seine",
+        "état_civil_de_l_accuse": null,
+        "enfant_naturel_ou_légitime_de_l_accuse": null,
+        "caractérstique_physique_de_l_accuse": {
+            "taille_de_l_accuse": "un mètre - 56 centimètres",
+            "couleur_des_cheveux_de_l_accuse": "châtains",
+            "caractéristique_du_front_de_l_accuse": "petit",
+            "couleur_des_yeux_de_l_accuse": "marrons clairs",
+            "caractéristique_du_nez_de_l_accuse": "ordinaire",
+            "caratéristique_du_visage_de_l_accuse": "ovale",
+            "renseignements_physionomiques_complémentaires_de_l_accuse": null,
+            "marque_particulière_de_l_accuse": "Engagé pour la durée de la guerre"
+        },
+        "raison_de_son_inculpation": "outrages envers des supérieurs",
+        "condamnations_antérieures": [
+            "Néant"
+        ]
+    },
+    "La séance ayant été ouverte": {
+        "defenseur": {
+            "nom_du_defenseur": "Me Chiénard",
+            "grade_du_defenseur": "officier d'Administration de 2^e classe",
+            "statut": "désigné d'office"
+        }
+    },
+    "Ouï M. le Commissaire": {
+        "requisitoire_du_commissaire": {
+            "declare_coupable_ou_non_coupable": "coupable",
+            "article_cite": "224"
+        }
+    },
+    "L'accusé a été reconduit": {
+        "inculpation": {
+            "faits_reproches_a_l_accuse": [
+                "d'avoir outragé par gestes et menaces son supérieur, le sergent Meignien",
+                "d'avoir outragé par paroles ses supérieurs, les gradés de la 90^e Compagnie"
+            ],
+            "date_du_crime_ou_du_delit": "11 Décembre 1915",
+            "lieu_du_crime_ou_du_delit": "Pére-Chambenoise (Marne)",
+            "complements_d_information_sur_le_crime_ou_le_délit": null,
+            "complicites_eventuelles": null
+        }
+    },
+    "Les voix recueillies séparément": {
+        "decision_of_conseil_de_guerre": [
+            {
+                "guilty_or_not_guilty": "coupable",
+                "unanimity_or_majority": "unanimité"
+            },
+            {
+                "guilty_or_not_guilty": "coupable",
+                "unanimity_or_majority": "unanimité"
+            }
+        ]
+    },
+    "Sur quoi, et attendu les conclusions": {
+        "peine_prononcee": {
+            "nature_de_la_peine": "emprisonnement",
+            "duree_de_la_peine": "deux ans",
+            "autres_mesures": [
+                "contrainte par corps",
+                "frais envers l'État"
+            ]
+        },
+        "article_du_code_militaire_applique": [
+            "Article 224 - Code de Justice Militaire",
+            "Article 135 - Code de Justice Militaire",
+            "Article 139 - Code de Justice Militaire",
+            "Article 9 - Loi du 22 juillet 1862"
+        ]
+    },
+    "Enjoint au Commissaire du Gouvernement": {
+        "execution_de_la_peine": {
+            "date_de_lecture_du_jugement": "le onze Janvier 1916",
+            "lieu_de_la_seance_publique": "Chalons s/Marne"
+        }
+    },
+    "EXÉCUTOIRE": {
+        "somme_a_payer_par_l_accuse": 12.65
+    }
+}
