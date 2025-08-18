@@ -2,6 +2,7 @@ import os
 import requests
 import time
 import re
+import unicodedata
 
 OLLAMA_MODEL = "phi4"
 API_URL = "http://localhost:11434/api/chat"
@@ -25,13 +26,11 @@ SECTION_KEYWORDS = [
     "=== Notes en marge ==="
 ]
 
-EXEMPLES_PAR_SECTION = EXEMPLES_PAR_SECTION = {
+EXEMPLES_PAR_SECTION = {
     "RÉPUBLIQUE FRANÇAISE": """Exemple : RÉPUBLIQUE FRANÇAISE.
 N^o DU JUGEMENT:[numéro]
 (Art. 140 du Code de justice militaire.)
 MINUTE DE JUGEMENT.
-
-JUGEMENT rendu par le CONSEIL DE GUERRE permanent du Quartier Général de la IV^e Armée séant à [lieu].
 
 N^o 967 DE LA NOMENCLATURE GÉNÉRALE.
 FORMULE N^o 16.
@@ -40,11 +39,15 @@ N^o [numéro] D'ORDRE.
 Date du crime ou du délit.
 [date]
 
+JUGEMENT rendu par le CONSEIL DE GUERRE permanent du Quartier Général de la [nom de l'armée] séant à [lieu].
+
+[Si indiqué :]Execution du jugement .
+
 AU NOM DU PEUPLE FRANÇAIS,
-Le Conseil de guerre permanent du Quartier Général de la IV^e Armée a rendu le jugement dont la teneur suit:""",
+Le Conseil de guerre permanent du Quartier Général de la [nom de l'armée] a rendu le jugement dont la teneur suit:""",
 
     "CEJOURD'HUI": """Exemple : CEJOURD'HUI [date]
-Le Conseil de guerre permanent du Quartier Général de la IV^e Armée composé, conformément àux l'articles 35 et 10 du Code de justice militaire, de MM.
+Le Conseil de guerre permanent du Quartier Général de la [nom de l'armée], conformément àux l'articles 35 et 10 du Code de justice militaire, de MM.
 [nom], [grade]
 Président;
 
@@ -54,7 +57,7 @@ Président;
 [nom], [grade].
 Juges.
 
-tous nommés par le (1) Général Commandant la IV^e armée
+tous nommés par le (1) Général Commandant la [nom de l'armée]
 M. [nom], [grade];
 M. [nom], [grade].
 
@@ -189,14 +192,20 @@ partie de la détention préventive sur la durée de la peine prononcée.
 (2) Aux colonies et aux armées."""
 }
 
+def normaliser(texte: str) -> str:
+    """Normalise le texte (NFC, supprime les doubles espaces, harmonise casse)."""
+    texte = unicodedata.normalize("NFC", texte)
+    return texte
+
 def envoyer_bloc_chat(bloc, history):
     messages = [{
         "role": "system",
         "content": (
-            "Tu es un correcteur silencieux. Corrige uniquement les fautes de transcription (fautes d’orthographe, coquilles, mots mal lus ou déformés), sans jamais ajouter de commentaire, d’explication, ni de remarque. "
-            "Préserve absolument la formulation originale, y compris les tournures anciennes et la syntaxe. "
-            "Rends uniquement le texte corrigé, sans balise, sans titre, sans entête, sans mention de correction. "
-            "Le texte est issu d’une minute de jugement de la Première Guerre mondiale."
+            "Tu es un correcteur silencieux. Corrige uniquement les fautes de transcription "
+            "(fautes d’orthographe, coquilles, mots mal lus ou déformés), sans jamais ajouter de commentaire, "
+            "d’explication, ni de remarque. Préserve absolument la formulation originale, y compris les tournures "
+            "anciennes et la syntaxe. Rends uniquement le texte corrigé, sans balise, sans titre, sans entête, "
+            "sans mention de correction. Le texte est issu d’une minute de jugement de la Première Guerre mondiale."
         )
     }]
     messages += history[-HISTORY_MAX:]
@@ -209,7 +218,6 @@ def envoyer_bloc_chat(bloc, history):
                 "messages": messages,
                 "stream": False
             }, timeout=60)
-
             response.raise_for_status()
             data = response.json()
             return data["message"]["content"].strip()
@@ -221,19 +229,39 @@ def envoyer_bloc_chat(bloc, history):
     return bloc
 
 def decouper_en_sections(texte, keywords):
-    pattern = r"(?=(" + "|".join(re.escape(k) for k in keywords) + r"))"
+    texte = normaliser(texte)
+    pattern = r"(?i)(?=(" + "|".join(re.escape(normaliser(k)) for k in keywords) + r"))"
     indices = [m.start() for m in re.finditer(pattern, texte)]
     if not indices:
         return [("Texte complet", texte)]
 
     sections = []
+    skip_until = -1  # position pour sauter les doublons
     for i, start in enumerate(indices):
-        end = indices[i+1] if i+1 < len(indices) else len(texte)
-        section = texte[start:end].strip()
+        if start < skip_until:
+            continue  # ignorer les doublons
+
+        # Identifier le mot-clé correspondant
+        titre_section = None
         for kw in keywords:
-            if section.startswith(kw):
-                sections.append((kw, section))
+            if texte[start:].upper().startswith(normaliser(kw).upper()):
+                titre_section = kw
                 break
+        if not titre_section:
+            continue
+
+        # Cas spécial EXÉCUTOIRE
+        if titre_section.upper() == "EXÉCUTOIRE":
+            end = texte.find("=== Notes en marge ===", start)
+            if end == -1:
+                end = len(texte)
+            skip_until = end  # ignorer toutes les occurrences d'EXÉCUTOIRE avant Notes en marge
+        else:
+            end = indices[i+1] if i+1 < len(indices) else len(texte)
+
+        section = texte[start:end].strip()
+        sections.append((titre_section, section))
+
     return sections
 
 def corriger_fichier_texte(chemin_txt):

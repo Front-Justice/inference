@@ -114,7 +114,8 @@ python3 net-reg-lig.py
 
 ### 📁 Structuration finale et extraction du texte
 
-Organise chaque minute dans un dossier dédié et extrait le texte dans un fichier `min_*.txt` :
+Organise chaque minute dans un dossier dédié et extrait le texte dans un fichier `min_*.txt`.
+Ce dernier fichier ne contiendra pas les lignes rayées. :
 
 ```bash
 python3 tri+texte.py
