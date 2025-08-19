@@ -147,15 +147,31 @@ python3 ner.py
 ```
 
 ---
+## ✅ En août 2025
+1. **Détection des zones**  
+   - Dataset : 1 000 images  
+   - **mAP@50** : 98.3%  
+   - **Précision** : 98.2%  
+   - **Recall** : 96.7%  
 
-## ✅ Prochaines étapes
+2. **Segmentation des lignes et des masques**  
+   - Dataset : +120 000 lignes  
+   - **val_accuracy** : 0.995  
+   - **val_mean_acc** : 0.995  
+   - **val_mean_iu** : 0.652  
+   - **val_freq_iu** : 0.910  
 
-1. Améliorer la qualité de l’HTR :
+3. **Détection des caractères**  
+   - Modèle : `fondue_gd_fr_v3`  
+   - Fine-tuning : 250 pages  
 
-   * Atteindre **1 000** images annotées sur Roboflow
-   * Atteindre **500** exemples pour la segmentation (notamment pour détecter les marges)
-   * Entraîner un modèle `Party` pour la reconnaissance, à partir du dataset
-     (⚠️ nécessite un GPU puissant)
+---
 
-2. Automatiser la détection des **amnisties** et des **remises de peine** dans les minutes.
+## 🚀 Prochaines étapes
+
+1. **Améliorer la qualité de l’HTR**  
+   - Atteindre **500 exemples** pour la segmentation (notamment pour détecter les marges)  
+   - Entraîner un modèle `Party` pour la reconnaissance, à partir du dataset  
+     ⚠️ *Nécessite un GPU puissant*  
+
 
