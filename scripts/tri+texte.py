@@ -129,3 +129,12 @@ if current_min_id and any(zone_texts.values()):
     txt_path = os.path.join(min_dir, f"{current_min_id}.txt")
     write_minute_file(txt_path, zone_texts, zone_order, keywords)
     print(f"✅ Dernier document écrit : {current_min_id}")
+
+# Vérification du nombre de fichiers XML par dossier
+print("\n🔎 Vérification des dossiers...")
+for min_folder in sorted(os.listdir(output_path)):
+    folder_path = os.path.join(output_path, min_folder)
+    if os.path.isdir(folder_path):
+        xml_files = [f for f in os.listdir(folder_path) if f.endswith(".xml")]
+        if len(xml_files) > 4:
+            print(f"⚠️ Le dossier '{min_folder}' contient {len(xml_files)} fichiers XML")
