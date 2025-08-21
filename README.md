@@ -61,7 +61,7 @@ kraken -d cuda:0 -a -I "*.xml" -o ".ocr.xml" -f xml ocr -m models/250p_best.mlmo
 
 🗂 Résultats stockés dans les fichiers `*.ocr.xml`.
 
-#### ➕ Traitement des signatures
+#### ➕ Traitement des signatures et des titres
 
 Remplacer chaque ligne marquée `LABEL="CustomLine:signature"` par un simple `+` 
 et s'assurer que chaque ligne marquée `LABEL="RunningTitleZone"` correspond bien à `"RÉPUBLIQUE FRANÇAISE"`:

@@ -18,7 +18,7 @@ SECTION_KEYWORDS = [
     "Interrogé de", "Interrogés de",
     "Le Président, après avoir fait lire",
     "Ouï M. le Commissaire",
-    "L'accusé a été reconduit", "Les accusés ont été reconduits",
+    "L'accusé a été reconduit", "Les accusés ont été reconduits",
     "Les voix recueillies séparément",
     "Sur quoi, et attendu les conclusions",
     "Enjoint au Commissaire du Gouvernement",
@@ -88,6 +88,16 @@ Condamnations antérieures :
 [état civil : célibataire / marié / veuf], [nombre d’enfants éventuel],
 profession de [profession], demeurant à [ville], département de [département].""",
 
+    "Interrogés de": """Exemple : Interrogés de leurs nom, prénoms, âge, lieu de naissance, état, profession et domicile, les accusés ont répondu se nommer :
+[nom complet 1], [âge 1] ans, né à [lieu de naissance 1], département de [département 1],
+[état civil 1 : célibataire / marié / veuf], [nombre d’enfants éventuel 1],
+profession de [profession 1], demeurant à [ville 1], département de [département 1];
+
+[nom complet 2], [âge 2] ans, né à [lieu de naissance 2], département de [département 2],
+[état civil 2 : célibataire / marié / veuf], [nombre d’enfants éventuel 2],
+profession de [profession 2], demeurant à [ville 2], département de [département 2];
+
+… """,
 
     "Le Président, après avoir fait lire" : """Exemple : Le Président, après avoir fait lire par le greffier l'ordre de convocation, le rapport prescrit par l'article 108 du Code de justice militaire, et les pièces dont la lecture lui a paru nécessaire, a fait connaître a l'accusé les faits à raison desquels il est poursuivi, et lui a donné, ainsi qu'au défenseur, l'avertissement indiqué en l'article 121 dudit Code;
 Après quoi, il a procédé à l'interrogatoire de l'accusé et a fait entendre publiquement et séparément les témoins à charge (1) ; lesdits témoins ayant au préalable prêté serment de parler sans haine et sans crainte, juré de dire toute la vérité et rien que la vérité;
@@ -105,10 +115,30 @@ Le Président a posé les questions, conformément à l'article 132 du Code de j
 1^re question — [question]
 2^e question — [question]
 
-Il a été voté au scrutin secret, conformément à l'article 191 du Code de justice militaire, sur chacune de ces questions, ainsi que sur les circonstances atténuantes et sur l'application éventuelle de la loi de sursis.""",
+Il a été voté au scrutin secret, conformément à l'article 191 du Code de justice militaire, sur chacune de ces questions, ainsi que sur les circonstances atténuantes et sur l'application éventuelle de la loi de sursis.
+""",
 
-    "Les voix recueillies séparément" : """Exemple : Les voix recueillies séparément, conformément à l'article 131 du Code de justice militaire, en commençant par le grade inférieur, le Président ayant émis son opinion le dernier, le Conseil de guerre permanent déclare.
-[question] : [réponse]""",
+    "Les accusés ont été reconduits": """Exemple : Les accusés ont été reconduits par l'escorte à la prison.
+Le Commissaire du Gouvernement, le Greffier et les assistants dans l'auditoire se sont retirés sur l'invitation du Président.
+(4) Le Conseil, délibérant à huis clos, s'est retiré dans la chambre des délibérations.
+Le Président a posé les questions, conformément à l'article 132 du Code de justice militaire, ainsi qu'il suit :
+
+1^re question — [question accusé 1]
+2^e question — [question accusé 1]
+
+1^re question — [question accusé 2]
+2^e question — [question accusé 2]
+
+…
+
+Il a été voté au scrutin secret, conformément à l'article 191 du Code de justice militaire, sur chacune de ces questions, ainsi que sur les circonstances atténuantes et sur l'application éventuelle de la loi de sursis.
+""",
+
+    "Les voix recueillies séparément": """Exemple : Les voix recueillies séparément, conformément à l'article 131 du Code de justice militaire, en commençant par le grade inférieur, le Président ayant émis son opinion le dernier, le Conseil de guerre permanent déclare.
+[question accusé 1] : [réponse accusé 1]
+[question accusé 2] : [réponse accusé 2]
+…
+""",
 
     "Sur quoi, et attendu les conclusions" : """Exemple : Sur quoi, et attendu les conclusions prises par le Commissaire du Gouvernement dans ses réquisitions, le Président a lu le texte de la loi, recueilli de nouveau les voix dans la forme prescrite par les articles 131 et 134 du Code de justice militaire pour l'application de la peine.
 Le Conseil est rentré en séance publique, le Président a lu les motifs qui précèdent et le dispositif ci-dessous.

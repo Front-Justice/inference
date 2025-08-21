@@ -19,10 +19,10 @@ SECTION_KEYWORDS = [
     "CEJOURD",
     "A l'effet de juger",
     "La séance ayant été ouverte",
-    "Interrogé de",
+    "Interrogé de", "Interrogés de",
     "Le Président, après avoir fait lire",
     "Ouï M. le Commissaire",
-    "L'accusé a été reconduit",
+    "L'accusé a été reconduit", "Les accusés ont été reconduits",
     "Les voix recueillies séparément",
     "Sur quoi, et attendu les conclusions",
     "Enjoint au Commissaire du Gouvernement",
@@ -54,18 +54,20 @@ PROMPTS_SECTIONS = {
     "RÉPUBLIQUE FRANÇAISE": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
 Dans la section "RÉPUBLIQUE FRANÇAISE" à "CEJOURD", trouve ces informations :
-- numéro de l'armée
-- numéro du jugement (parfois la ligne sous "Jugement")
-- date du crime ou du délit 
-- séant à
 
-Il y a parfois également des informations sur l'exécution de la peine (avant "Au nom du peuple français").
+- numéro de l'armée
+- numéro du jugement (⚠️ le "N° du jugement", parfois écrit "N° DU JUGEMENT", **et non** le "N° de la nomenclature générale")
+- date du crime ou du délit 
+- séant à (lieu où siège le Conseil de guerre)
+
+Il y a parfois également des informations sur l'exécution de la peine (avant "Au nom du peuple français"). 
 Si c'est le cas, trouve :
  - date d'exécution de la peine
- - si la peine a été exécutée ou non
- - etc.
+ - si la peine a été exécutée, suspendue ou non exécutée
+ - motif éventuel de suspension
 
-Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+Retourne un JSON avec ces champs. 
+Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
 """,
     "CEJOURD": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
@@ -90,32 +92,48 @@ Retourne un JSON avec ces champs. Si une information est absente, indique `null`
 """,
     "A l'effet de juger": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
-Dans la section "A l'effet de juger" à "La séance ayant été ouverte", trouve ces informations :
-- nom de l'accusé
-- prénoms de l'accusé
-- parents de l'accusé
-    - prénoms du père de l'accusé
-    - nom et prénoms de la mère de l'accusé
-- date de naissance de l'accusé
-- lieu de naissance de l'accusé
-- département de naissance l'accusé
-- profession de l'accusé
-- lieu de résidence de l'accusé avant son entrée au service
-- état civil de l'accusé
-- enfant naturel ou légitime de l'accusé
-- caractérstique physique de l'accusé
-    - taille de l'accusé
-    - couleur des cheveux de l'accusé
-    - caractéristique du front de l'accusé
-    - couleur des yeux de l'accusé
-    - caractéristique du nez de l'accusé
-    - caratéristique du visage de l'accusé
-    - renseignements physionomiques complémentaires de l'accusé
-    - marque particulière de l'accusé
-- raison de son inculpation
-- ses condamnations antérieures (s'il y en a sous forme de liste)
 
-Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+⚠️ Important : Il peut y avoir plusieurs accusés listés dans cette section. Tu dois donc extraire les informations pour **chacun des accusés** et retourner une liste JSON.
+
+Pour chaque accusé, retourne les champs suivants :
+- nom_de_l_accuse
+- prenoms_de_l_accuse
+- parents_de_l_accuse
+    - prenoms_du_pere
+    - nom_et_prenoms_de_la_mere
+- date_de_naissance_de_l_accuse
+- lieu_de_naissance_de_l_accuse
+- departement_de_naissance_de_l_accuse
+- profession_de_l_accuse
+- lieu_de_residence_de_l_accuse_avant_son_entree_au_service
+- etat_civil_de_l_accuse
+- enfant_naturel_ou_legitime_de_l_accuse
+- caracteristiques_physiques_de_l_accuse
+    - taille_de_l_accuse
+    - couleur_des_cheveux_de_l_accuse
+    - caracteristique_du_front_de_l_accuse
+    - couleur_des_yeux_de_l_accuse
+    - caracteristique_du_nez_de_l_accuse
+    - caracteristique_du_visage_de_l_accuse
+    - renseignements_physionomiques_complements
+    - marque_particuliere_de_l_accuse
+- raison_de_son_inculpation
+- condamnations_anterieures (liste ou null)
+
+Retourne un JSON de cette forme :
+{
+  "A l'effet de juger": {
+    "accuses": [
+      { ... },
+      { ... }
+    ]
+  }
+}
+
+⚠️ Règles :
+- Si une information est absente pour un accusé, mets la valeur `null`.
+- Ne donne aucune explication, aucun texte en dehors du JSON.
+- Le JSON doit toujours être valide.
 """,
     "La séance ayant été ouverte": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
@@ -139,6 +157,18 @@ Lis maintenant la section "Interrogé de" à "Le Président, après avoir fait l
 
 Retourne uniquement un JSON **corrigé ou enrichi**, avec les mêmes champs. Ne retourne rien d’autre que ce JSON final.
 """,
+    "Interrogés de": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Tu as déjà extrait les informations suivantes sur les accusés à partir de la section "A l'effet de juger" :
+
+[JSON_ACCUSÉS]
+
+Lis maintenant la section "Interrogés de" à "Le Président, après avoir fait lire". Utilise-la pour :
+- confirmer ou corriger les informations déjà extraites pour chaque accusé
+- ajouter des informations manquantes si elles sont présentes
+
+Retourne uniquement un JSON **corrigé ou enrichi** pour tous les accusés, avec les mêmes champs. Ne retourne rien d’autre que ce JSON final.
+""",
     "Ouï M. le Commissaire": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918. 
 Dans la section "Ouï M. le Commissaire" à "L'accusé a été reconduit", trouve ces informations :
@@ -150,16 +180,80 @@ Retourne un JSON avec ces champs. Si une information est absente, indique `null`
 """,
     "L'accusé a été reconduit": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
-Dans la section "L'accusé a été reconduit" à "Les voix recueillies séparément", trouve ces informations :
-- inculpation
-    - faits reprochés à l'accusé
-    - date du crime ou du délit
-    - lieu du crime ou du délit
-    - compléments d'information sur le crime ou le délit
-    - complicité(s) éventuel(s)
+Dans la section "L'accusé a été reconduit" à "Les voix recueillies séparément", il y a un seul accusé.
 
-Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+Pour chaque accusé, identifié par son nom et prénom, extrais de manière structurée :
+- le numéro de la question : 1^o, 2^o, etc.
+- nom_prenom : nom et prénom de l'accusé
+- le crime ou délit : caractérise le (outrage, vol, desertion, etc.)
+- faits_reproches : ce qui décrivit le crime ou le délit
+- date_du_crime : date mentionnée pour ce crime/délit
+- lieu_du_crime : lieu mentionné pour ce crime/délit
+- complements : tout complément sur les circonstances ou incidents du crime/délit
+- complicites : toute mention de complicité, coauteur ou accomplice
+
+⚠️ Il peut y avoir un nombre variable de questions par accusé. Chaque accusé doit être un objet JSON séparé.
+
+Retourne un JSON de la forme :
+{
+  "Les accusés ont été reconduits": {
+    "inculpations": [
+      {
+        "numero_question": 1,
+        "nom_prenom": "...",
+        "crime_ou_délit": "...",
+        "faits_reproches": "...",
+        "date_du_crime": "...",
+        "lieu_du_crime": "...",
+        "complements": "...",
+        "complicites": "..."
+      },
+      ...
+    ]
+  }
+}
+
+Si une information est absente, mets `null`. Pas d’explication, uniquement un JSON valide.
 """,
+
+    "Les accusés ont été reconduits": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
+Le texte qui suit est une minute de jugement militaire française de 1914-1918.
+Dans la section "Les accusés ont été reconduits" à "Les voix recueillies séparément", il peut y avoir plusieurs accusés.
+
+Pour chaque accusé, identifié par son nom et prénom, extrais de manière structurée :
+- le numéro de la question : 1^o, 2^o, etc.
+- nom_prenom : nom et prénom de l'accusé
+- le crime ou délit : caractérise le (outrage, vol, desertion, etc.)
+- faits_reproches : ce qui décrivit le crime ou le délit
+- date_du_crime : date mentionnée pour ce crime/délit
+- lieu_du_crime : lieu mentionné pour ce crime/délit
+- complements : tout complément sur les circonstances ou incidents du crime/délit
+- complicites : toute mention de complicité, coauteur ou accomplice
+
+⚠️ Il peut y avoir un nombre variable de questions par accusé. Chaque accusé doit être un objet JSON séparé.
+
+Retourne un JSON de la forme :
+{
+  "Les accusés ont été reconduits": {
+    "inculpations": [
+      {
+        "numero_question": 1,
+        "nom_prenom": "...",
+        "crime_ou_délit": "...",
+        "faits_reproches": "...",
+        "date_du_crime": "...",
+        "lieu_du_crime": "...",
+        "complements": "...",
+        "complicites": "..."
+      },
+      ...
+    ]
+  }
+}
+
+Si une information est absente, mets `null`. Pas d’explication, uniquement un JSON valide.
+""",
+
     "Les voix recueillies séparément": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
 Dans la section "Les voix recueillies séparément" à "Sur quoi, et attendu les conclusions", trouve ces informations :
@@ -171,14 +265,26 @@ Retourne un JSON avec ces champs. Si une information est absente, indique `null`
 """,
     "Sur quoi, et attendu les conclusions": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
-Dans la section "Sur quoi, et attendu les conclusions" à "Enjoint au Commissaire du Gouvernement", trouve ces informations :
-- peine prononcée
-    - nature de la peine (ex. : emprisonnement, amende, etc.)
-    - durée de la peine (si applicable)
-    - autres mesures (ex. : dégradation, confiscation, etc.)
-- article du code militaire appliqué
+Dans la section "Sur quoi, et attendu les conclusions" à "Enjoint au Commissaire du Gouvernement", trouve pour chaque question posée par le Président :
+- nom_prenom_accuse : nom et prénom de l'accusé concerné
+- résultat du vote (ex. : oui, non, coupable, non coupable)
+- peine prononcée (ex. : emprisonnement, amende, acquittement)
+- éventuels compléments d'information (ex. : observations)
 
-Retourne un JSON avec ces champs. Si une information est absente, indique `null`. Pas d'explication, uniquement un JSON valide.
+Retourne un JSON de la forme :
+{
+  "Sur quoi, et attendu les conclusions": [
+    {
+      "nom_prenom_accuse": "...",
+      "resultat": "",
+      "peine_prononcee": "",
+      "complements": ""
+    },
+    ...
+  ]
+}
+
+Si une information est absente, mets `null`. Pas d’explication, uniquement un JSON valide.
 """,
     "Enjoint au Commissaire du Gouvernement": """Tu es un expert en extraction d’informations à partir de documents judiciaires historiques.
 Le texte qui suit est une minute de jugement militaire française de 1914-1918.
@@ -206,20 +312,17 @@ def normaliser(texte: str) -> str:
     return texte
 
 def decouper_en_sections(texte, keywords):
-    """
-    Découpe le texte en sections selon les mots-clés.
-    Cas particulier : EXÉCUTOIRE s'arrête toujours avant '=== Notes en marge ==='.
-    """
     texte = normaliser(texte)
-
-    # Création des indices pour tous les mots-clés
-    pattern = r"(?i)(?=(" + "|".join(re.escape(k) for k in keywords) + r"))"
+    pattern = r"(?i)(?=(" + "|".join(re.escape(normaliser(k)) for k in keywords) + r"))"
     indices = [m.start() for m in re.finditer(pattern, texte)]
     if not indices:
         return [("Texte complet", texte)]
 
     sections = []
-    skip_until = -1  # pour ignorer doublons EXÉCUTOIRE
+    skip_until = -1
+    longueur_totale = len(texte)
+    seuil_executoire = int(longueur_totale * 0.65)
+
     for i, start in enumerate(indices):
         if start < skip_until:
             continue
@@ -227,18 +330,21 @@ def decouper_en_sections(texte, keywords):
         # Identifier le mot-clé correspondant
         titre_section = None
         for kw in keywords:
-            if texte[start:].upper().startswith(kw.upper()):
+            if texte[start:].upper().startswith(normaliser(kw).upper()):
                 titre_section = kw
                 break
         if not titre_section:
             continue
 
-        # Cas spécial EXÉCUTOIRE
-        if titre_section.upper() == "EXÉCUTOIRE":
+        # Cas spécial EXÉCUTOIRE → seulement si on est dans le dernier quart
+        if titre_section.upper() == "EXÉCUTOIRE" and start >= seuil_executoire:
             end = texte.find("=== Notes en marge ===", start)
             if end == -1:
                 end = len(texte)
-            skip_until = end  # ignorer tous les EXÉCUTOIRE avant Notes en marge
+            skip_until = end
+        elif titre_section.upper() == "EXÉCUTOIRE" and start < seuil_executoire:
+            # On ignore cette occurrence, on continue la boucle
+            continue
         else:
             end = indices[i+1] if i+1 < len(indices) else len(texte)
 
@@ -246,7 +352,6 @@ def decouper_en_sections(texte, keywords):
         sections.append((titre_section, section))
 
     return sections
-
 
 def envoyer_prompt_sur_bloc(prompt, bloc):
     messages = [
