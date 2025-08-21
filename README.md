@@ -81,8 +81,9 @@ Sur la **première page de chaque minute**, vérifier :
 * La date
 * Le numéro de jugement
 * Le nom de l’armée concernée
+* Les notes en marge
 
-Ces éléments critiques ne doivent pas être laissés à la seule reconnaissance automatique.
+Ces éléments importants ne doivent pas être laissés à la seule reconnaissance automatique.
 
 📦 Pour faciliter l’import dans eScriptorium :
 
@@ -138,8 +139,8 @@ python3 post-oll.py
 ```
 
 Ce script indique également les minutes qui n'ont pas été correctement traitées.
-Pour ces dernières, il faut reprendre manuellement, dans les fichiers min_*.txt dans le dossier transcriptions, les sections qui ne sont pas reconnues.
-Ensuite, il est possible de lancer le script post-oll-rect.py en ayant préalablement écrit dans le script les minutes concernées.
+Pour ces dernières, il faut reprendre manuellement, dans les fichiers `min_*.txt` du dossier `transcriptions`, les sections qui ne sont pas reconnues.
+Ensuite, il est possible de lancer le script `post-oll-rect.py` en ayant préalablement indiqué dans le script les minutes concernées.
 
 ```bash
 python3 post-oll-rect.py
@@ -149,7 +150,7 @@ python3 post-oll-rect.py
 
 ## 🧠 Extraction des informations via Ollama
 
-La reconnaissance d'entités nommées (NER) est effectuée avec notre LLM, qui produit des fichiers JSON :
+La reconnaissance d'entités nommées (NER) est effectuée avec notre LLM, qui produit des fichiers JSON dans les dossiers de chaque minute :
 
 ```bash
 python3 ner.py
