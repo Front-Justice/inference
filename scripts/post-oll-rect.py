@@ -237,14 +237,10 @@ def decouper_en_sections(texte, keywords):
 
     sections = []
     skip_until = -1
-    longueur_totale = len(texte)
-    seuil_executoire = int(longueur_totale * 0.65)
-
     for i, start in enumerate(indices):
         if start < skip_until:
             continue
 
-        # Identifier le mot-clé correspondant
         titre_section = None
         for kw in keywords:
             if texte[start:].upper().startswith(normaliser(kw).upper()):
@@ -253,15 +249,11 @@ def decouper_en_sections(texte, keywords):
         if not titre_section:
             continue
 
-        # Cas spécial EXÉCUTOIRE → seulement si on est dans le dernier quart
-        if titre_section.upper() == "EXÉCUTOIRE" and start >= seuil_executoire:
+        if titre_section.upper() == "EXÉCUTOIRE":
             end = texte.find("=== Notes en marge ===", start)
             if end == -1:
                 end = len(texte)
             skip_until = end
-        elif titre_section.upper() == "EXÉCUTOIRE" and start < seuil_executoire:
-            # On ignore cette occurrence, on continue la boucle
-            continue
         else:
             end = indices[i+1] if i+1 < len(indices) else len(texte)
 
@@ -269,7 +261,6 @@ def decouper_en_sections(texte, keywords):
         sections.append((titre_section, section))
 
     return sections
-
 
 def corriger_fichier_texte(chemin_txt, minutes_incompletes):
     with open(chemin_txt, "r", encoding="utf-8") as f:
@@ -282,7 +273,6 @@ def corriger_fichier_texte(chemin_txt, minutes_incompletes):
     for i, (titre_section, contenu_section) in enumerate(sections):
         print(f"🔁 {os.path.basename(chemin_txt)} - Section '{titre_section}' ({i+1}/{len(sections)})")
         
-        # Découpe automatique si bloc trop long
         if len(contenu_section) > MAX_TAILLE_BLOC:
             sous_blocs = [contenu_section[i:i+MAX_TAILLE_BLOC] for i in range(0, len(contenu_section), MAX_TAILLE_BLOC)]
             corrections = []
@@ -306,28 +296,35 @@ def corriger_fichier_texte(chemin_txt, minutes_incompletes):
 
     print(f"✅ Fichier corrigé : {chemin_sortie}\n")
 
-    # Vérifier le nombre de sections
     if len(sections) < 11:
         minutes_incompletes.append(os.path.basename(chemin_txt).replace(".txt", ""))
 
-
-def traiter_dossier_racine(dataset_root):
+def traiter_fichiers_specifiques(dataset_root, fichiers_cibles):
     minutes_incompletes = []
-    for dossier in sorted(os.listdir(dataset_root)):
-        dossier_complet = os.path.join(dataset_root, dossier)
-        if os.path.isdir(dossier_complet):
-            fichiers_txt = [f for f in os.listdir(dossier_complet) if f.endswith(".txt") and not f.endswith("_corrige.txt")]
-            for fichier in fichiers_txt:
-                chemin_txt = os.path.join(dossier_complet, fichier)
-                corriger_fichier_texte(chemin_txt, minutes_incompletes)
+    for fichier in fichiers_cibles:
+        chemin_txt = os.path.join(dataset_root, fichier)
+        if os.path.exists(chemin_txt):
+            corriger_fichier_texte(chemin_txt, minutes_incompletes)
+        else:
+            print(f"⚠️ Fichier introuvable : {chemin_txt}")
 
-    # Rapport final
     if minutes_incompletes:
         print("\n⚠️ Traitement à reprendre : " + ", ".join(minutes_incompletes))
     else:
-        print("\n✅ Toutes les minutes ont au moins 11 sections reconnues.")
+        print("\n✅ Toutes les minutes traitées ont au moins 11 sections reconnues.")
 
-
+### Fichier à reprendre ###
+# <!-- Adapter le nom des fichiers à traiter --> #
 if __name__ == "__main__":
-    dossier_racine = "../transcriptions"
-    traiter_dossier_racine(dossier_racine)
+    dossier_racine = "../transcriptions/"  
+
+    # Liste des dossiers (et donc des fichiers à traiter)
+    dossiers = [
+        "min_082",
+    ]
+
+    for dossier in dossiers:
+        chemin_dossier = os.path.join(dossier_racine, dossier)
+        fichier = f"{dossier}.txt"  
+        traiter_fichiers_specifiques(chemin_dossier, [fichier])
+

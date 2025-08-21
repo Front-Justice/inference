@@ -18,13 +18,21 @@ for filename in os.listdir(dataset_path):
         tree = ET.parse(full_path)
         root = tree.getroot()
 
-        count = 0
+        count_signature = 0
+        count_running = 0
 
+        # Cas 1 : lignes de signature
         for line in root.findall(".//{{{}}}TextLine".format(NAMESPACE)):
             if line.get("LABEL") == "CustomLine:signature":
                 for string in line.findall(".//{{{}}}String".format(NAMESPACE)):
                     string.set("CONTENT", "+")
-                count += 1
+                count_signature += 1
+
+            # Cas 2 : RunningTitleZone
+            elif line.get("LABEL") == "RunningTitleZone":
+                for string in line.findall(".//{{{}}}String".format(NAMESPACE)):
+                    string.set("CONTENT", "RÉPUBLIQUE FRANÇAISE")
+                count_running += 1
 
         tree.write(full_path, encoding="UTF-8", xml_declaration=True)
-        print(f"→ {count} ligne(s) modifiée(s)\n")
+        print(f"→ {count_signature} signature(s) modifiée(s), {count_running} RunningTitleZone modifié(s)\n")

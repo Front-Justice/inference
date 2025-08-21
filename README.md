@@ -63,11 +63,12 @@ kraken -d cuda:0 -a -I "*.xml" -o ".ocr.xml" -f xml ocr -m models/250p_best.mlmo
 
 #### ➕ Traitement des signatures
 
-Remplacer chaque ligne marquée `LABEL="CustomLine:signature"` par un simple `+` :
+Remplacer chaque ligne marquée `LABEL="CustomLine:signature"` par un simple `+` 
+et s'assurer que chaque ligne marquée `LABEL="RunningTitleZone"` correspond bien à `"RÉPUBLIQUE FRANÇAISE"`:
 
 ```bash
 cd htr/scripts
-python3 signature.py
+python3 sign+titre.py
 ```
 
 ---
@@ -134,6 +135,14 @@ Appliquer le modèle LLM Phi-4 pour corriger automatiquement les transcriptions 
 
 ```bash
 python3 post-oll.py
+```
+
+Ce script indique également les minutes qui n'ont pas été correctement traitées.
+Pour ces dernières, il faut reprendre manuellement, dans les fichiers min_*.txt dans le dossier transcriptions, les sections qui ne sont pas reconnues.
+Ensuite, il est possible de lancer le script post-oll-rect.py en ayant préalablement écrit dans le script les minutes concernées.
+
+```bash
+python3 post-oll-rect.py
 ```
 
 ---
