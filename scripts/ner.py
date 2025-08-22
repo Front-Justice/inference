@@ -371,7 +371,7 @@ def envoyer_prompt_sur_bloc(prompt, bloc):
                 "model": OLLAMA_MODEL,
                 "messages": messages,
                 "stream": False
-            }, timeout=60)
+            }, timeout=300)
 
             response.raise_for_status()
             data = response.json()
@@ -394,9 +394,13 @@ def envoyer_prompt_sur_bloc(prompt, bloc):
     return None
 
 # === Traitement principal ===
+minutes_echouees = []  # <-- on garde trace ici
+
 for fichier_texte, fichier_sortie in minutes_a_traiter:
     print(f"\n📂 Traitement de la minute : {fichier_texte}")
-    
+    nom_minute = os.path.basename(fichier_texte).split("_")[1]  # ex: "025"
+    erreurs_section = []  # pour cette minute
+
     with open(fichier_texte, "r", encoding="utf-8") as f:
         texte_jugement = f.read()
 
@@ -409,7 +413,7 @@ for fichier_texte, fichier_sortie in minutes_a_traiter:
 
         prompt = PROMPTS_SECTIONS.get(nom_section)
 
-        # Cas spécial pour "Interrogé de"
+        # Cas spécial "Interrogé de"
         if nom_section == "Interrogé de":
             donnees_existantes = resultat_json.get("A l'effet de juger", {})
             if not donnees_existantes:
@@ -434,9 +438,16 @@ for fichier_texte, fichier_sortie in minutes_a_traiter:
                         print(f"✅ Section {nom_section} traitée avec succès.")
                 except json.JSONDecodeError as e:
                     print(f"⚠️ JSON invalide pour la section {nom_section} :", e)
+                    erreurs_section.append(nom_section)
                     resultat_json[nom_section] = {"_raw_response": json_str}
+            else:
+                erreurs_section.append(nom_section)  # <-- on note l'échec
         else:
             print(f"⚠️ Pas de prompt défini pour la section : {nom_section}, elle est ignorée.")
+
+    # Si au moins une section a échoué, on note la minute
+    if erreurs_section:
+        minutes_echouees.append((nom_minute, erreurs_section))
 
     # === Sauvegarde du JSON final ===
     print(f"💾 Sauvegarde du JSON structuré dans {fichier_sortie}")
@@ -444,3 +455,11 @@ for fichier_texte, fichier_sortie in minutes_a_traiter:
         json.dump(resultat_json, f, ensure_ascii=False, indent=4)
 
     print("✅ Traitement terminé pour cette minute.")
+
+# === Bilan final ===
+if minutes_echouees:
+    print("\n⛔ Bilan des échecs :")
+    for minute, sections in minutes_echouees:
+        print(f" - Minute {minute} : sections échouées -> {', '.join(sections)}")
+else:
+    print("\n🎉 Toutes les minutes ont été traitées avec succès !")
